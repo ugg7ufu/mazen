@@ -1,0 +1,26 @@
+{
+  "name": "code-workspace",
+  "version": "1.0.0",
+  "description": "مساحة عمل تطوير الأكواد البرمجية",
+  "main": "index.js",
+  "scripts": {
+    "dev": "echo 'بدء وضع التطوير'",
+    "build": "echo 'بناء المشروع'",
+    "test": "echo 'تشغيل الاختبارات'",
+    "lint": "echo 'فحص الكود'",
+    "start": "echo 'تشغيل المشروع'"
+  },
+  "keywords": [
+    "development",
+    "workspace",
+    "coding",
+    "programming"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "prettier": "^2.8.0"
+  },
+  "dependencies": {}
+} 

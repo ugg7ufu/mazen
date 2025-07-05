@@ -1,0 +1,148 @@
+version: '3.8'
+
+services:
+  # خادم PHP
+  php:
+    build: ./src/php
+    ports:
+      - "8000:80"
+    volumes:
+      - ./src/php:/var/www/html
+    environment:
+      - DB_HOST=mysql
+      - DB_NAME=dev_workspace
+      - DB_USER=root
+      - DB_PASS=password
+    depends_on:
+      - mysql
+    networks:
+      - dev-network
+
+  # خادم Python Flask
+  python:
+    build: ./src/python
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./src/python:/app
+    environment:
+      - FLASK_ENV=development
+      - FLASK_APP=app.py
+    networks:
+      - dev-network
+
+  # خادم React
+  react:
+    build: ./src/react
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./src/react:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    networks:
+      - dev-network
+
+  # قاعدة بيانات MySQL
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=dev_workspace
+      - MYSQL_USER=dev
+      - MYSQL_PASSWORD=dev123
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - dev-network
+
+  # قاعدة بيانات PostgreSQL
+  postgres:
+    image: postgres:13
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=dev_workspace
+      - POSTGRES_USER=dev
+      - POSTGRES_PASSWORD=dev123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - dev-network
+
+  # قاعدة بيانات MongoDB
+  mongodb:
+    image: mongo:5.0
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=dev_workspace
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - dev-network
+
+  # Redis للكاش
+  redis:
+    image: redis:6-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - dev-network
+
+  # phpMyAdmin لإدارة MySQL
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8080:80"
+    environment:
+      - PMA_HOST=mysql
+      - PMA_USER=root
+      - PMA_PASSWORD=password
+    depends_on:
+      - mysql
+    networks:
+      - dev-network
+
+  # pgAdmin لإدارة PostgreSQL
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - "8081:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@dev.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    depends_on:
+      - postgres
+    networks:
+      - dev-network
+
+  # MongoDB Compass (واجهة رسومية)
+  mongo-express:
+    image: mongo-express
+    ports:
+      - "8082:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=admin
+    depends_on:
+      - mongodb
+    networks:
+      - dev-network
+
+volumes:
+  mysql_data:
+  postgres_data:
+  mongodb_data:
+  redis_data:
+
+networks:
+  dev-network:
+    driver: bridge 
